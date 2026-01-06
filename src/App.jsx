@@ -1,16 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 export default function App() {
-  const [count, setCount] = useState(0)
+  const [loading, setLoading] = useState(0)
   const [disabled, setDisabled] = useState(false);
   // 输入/输出
   const [inputText, setInputText] = useState('Hello, world!');
   const [outputText, setOutputText] = useState('');
   const [srcLang, setSrcLang] = useState('eng_Latn');
   const [tgtLang, setTgtLang] = useState('zho_Hans');
+  const [progress, setProgress] = useState({file: '', progress: 0})
 
    const translationWorker = useRef(null); // 创建一个用于保存 Worker 线程的 ref 对象
 
@@ -40,6 +39,8 @@ export default function App() {
     }
 
     const handleWorkerMessage = (e) => {
+        console.log(e.data)
+        setProgress({file: e.data.file, progress: e.data.progress})
         switch (e.data.status) {
         case 'complete': // 如果翻译完成
           setOutputText(e.data.output[0].translation_text); // 更新输出文本
@@ -67,6 +68,9 @@ export default function App() {
           <textarea value={outputText} rows={3} readOnly></textarea>
         </div>
       </div>
+          <p>首次翻译等待时间较长</p>
+          <p> {progress.file && `file: ${progress.file}`}</p>
+          <p> {progress.file && `progress: ${progress.progress?.toFixed(2) || 100}%`}</p>
 
       <button disabled={disabled} onClick={handleTranslate}>点击翻译</button>
     </>
